@@ -51,6 +51,7 @@ public:
 	void set_ui_velocity_magnitude(float magnitude);
 	void set_ui_velocity_direction(Vector3 direction);
 	void apply_ui_parameters();
+	void apply_ui_parameters_realtime(); // New method for real-time updates
 	float get_ui_distance() const;
 	float get_ui_velocity_magnitude() const;
 	Vector3 get_ui_velocity_direction() const;

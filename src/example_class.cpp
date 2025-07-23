@@ -37,6 +37,7 @@ void ExampleClass::_bind_methods() {
 	godot::ClassDB::bind_method(D_METHOD("set_ui_velocity_magnitude", "magnitude"), &ExampleClass::set_ui_velocity_magnitude);
 	godot::ClassDB::bind_method(D_METHOD("set_ui_velocity_direction", "direction"), &ExampleClass::set_ui_velocity_direction);
 	godot::ClassDB::bind_method(D_METHOD("apply_ui_parameters"), &ExampleClass::apply_ui_parameters);
+	godot::ClassDB::bind_method(D_METHOD("apply_ui_parameters_realtime"), &ExampleClass::apply_ui_parameters_realtime);
 	godot::ClassDB::bind_method(D_METHOD("get_ui_distance"), &ExampleClass::get_ui_distance);
 	godot::ClassDB::bind_method(D_METHOD("get_ui_velocity_magnitude"), &ExampleClass::get_ui_velocity_magnitude);
 	godot::ClassDB::bind_method(D_METHOD("get_ui_velocity_direction"), &ExampleClass::get_ui_velocity_direction);
@@ -158,6 +159,11 @@ void ExampleClass::set_ui_velocity_direction(Vector3 direction) {
 void ExampleClass::apply_ui_parameters() {
 	Vector3 start_position = Vector3(ui_distance, 0, 0);
 	set_satellite(start_position, ui_velocity, satellite_mass);
+}
+
+void ExampleClass::apply_ui_parameters_realtime() {
+	// Only update velocity, keep current position for smooth real-time updates
+	satellite_velocity = ui_velocity;
 }
 
 float ExampleClass::get_ui_distance() const {

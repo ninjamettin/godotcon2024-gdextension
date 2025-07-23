@@ -92,36 +92,48 @@ func create_cpp_ui_controls():
 	# Title
 	var title = Label.new()
 	ui_panel.add_child(title)
-	title.text = "C++ Orbital Simulator"
+	title.text = "C++ Orbital Simulator (Real-time)"
 	title.position = Vector2(10, 10)
 	title.add_theme_color_override("font_color", Color.WHITE)
-	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_font_size_override("font_size", 16)
 	
 	# Distance control
 	create_slider_control("Distance", 40, 1.0, 15.0, gravity_sim.get_ui_distance(), 
-		func(value): gravity_sim.set_ui_distance(value))
+		func(value): gravity_sim.set_ui_distance(value))  # Distance changes need apply button
 	
 	# Magnitude control  
 	create_slider_control("Velocity Mag", 80, 0.0, 8.0, gravity_sim.get_ui_velocity_magnitude(),
-		func(value): gravity_sim.set_ui_velocity_magnitude(value))
+		func(value): 
+			gravity_sim.set_ui_velocity_magnitude(value)
+			gravity_sim.apply_ui_parameters_realtime()  # Real-time update
+	)
 	
 	# Direction controls
 	var vel_dir = gravity_sim.get_ui_velocity_direction()
 	create_slider_control("Dir X", 120, -1.0, 1.0, vel_dir.x,
-		func(value): update_direction_component(0, value))
+		func(value): 
+			update_direction_component(0, value)
+			gravity_sim.apply_ui_parameters_realtime()  # Real-time update
+	)
 	create_slider_control("Dir Y", 160, -1.0, 1.0, vel_dir.y,
-		func(value): update_direction_component(1, value))
+		func(value): 
+			update_direction_component(1, value)
+			gravity_sim.apply_ui_parameters_realtime()  # Real-time update
+	)
 	create_slider_control("Dir Z", 200, -1.0, 1.0, vel_dir.z,
-		func(value): update_direction_component(2, value))
+		func(value): 
+			update_direction_component(2, value)
+			gravity_sim.apply_ui_parameters_realtime()  # Real-time update
+	)
 	
 	# Apply button
 	var apply_btn = Button.new()
 	ui_panel.add_child(apply_btn)
-	apply_btn.text = "Apply C++ Parameters"
+	apply_btn.text = "Apply Distance\n& Reset Position"
 	apply_btn.position = Vector2(10, 240)
 	apply_btn.size = Vector2(200, 30)
 	apply_btn.connect("pressed", func(): 
-		gravity_sim.apply_ui_parameters()
+		gravity_sim.apply_ui_parameters()  # Full reset with new position
 		trail_points.clear()
 		update_all_labels()
 	)
