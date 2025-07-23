@@ -1,8 +1,8 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://gravity_3d_demo.gd" id="1"]
+[ext_resource type="Script" path="res://gravity_cpp_demo.gd" id="1"]
 
-[node name="Gravity3DDemo" type="Node3D"]
+[node name="GravityCppDemo" type="Node3D"]
 script = ExtResource("1")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]

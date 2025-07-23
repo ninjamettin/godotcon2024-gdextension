@@ -6,8 +6,21 @@ var satellite_mesh: MeshInstance3D
 var trail_mesh: MeshInstance3D
 var camera: Camera3D
 
+# UI Controls
+var distance_slider: HSlider
+var velocity_x_slider: HSlider
+var velocity_y_slider: HSlider
+var velocity_z_slider: HSlider
+var magnitude_slider: HSlider
+var distance_label: Label
+var velocity_label: Label
+var magnitude_label: Label
+
 var trail_points: Array[Vector3] = []
 var max_trail_points: int = 500
+
+var current_distance: float = 5.0
+var current_velocity: Vector3 = Vector3(0, 0, 3.16)
 
 func _ready():
 	# Create the gravity simulator
@@ -18,12 +31,12 @@ func _ready():
 	gravity_sim.set_gravitational_constant(50.0)
 	
 	# Set up satellite with proper circular orbit velocity
-	# For circular orbit: v = sqrt(GM/r)
-	gravity_sim.set_satellite(Vector3(5, 0, 0), Vector3(0, 0, 3.16), 1.0)
+	gravity_sim.set_satellite(Vector3(current_distance, 0, 0), current_velocity, 1.0)
 	
 	# Create visual elements
 	create_visual_elements()
 	setup_camera()
+	create_ui_controls()
 
 func create_visual_elements():
 	# Create planet (large blue sphere at origin)
@@ -71,6 +84,152 @@ func setup_camera():
 	add_child(camera)
 	camera.position = Vector3(10, 8, 10)
 	camera.look_at(Vector3.ZERO, Vector3.UP)
+
+func create_ui_controls():
+	# Create UI container
+	var ui_container = Control.new()
+	add_child(ui_container)
+	ui_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	
+	# Create control panel background
+	var panel = Panel.new()
+	ui_container.add_child(panel)
+	panel.position = Vector2(20, 20)
+	panel.size = Vector2(350, 280)
+	
+	var panel_style = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0, 0, 0, 0.7)
+	panel_style.corner_radius_top_left = 10
+	panel_style.corner_radius_top_right = 10
+	panel_style.corner_radius_bottom_left = 10
+	panel_style.corner_radius_bottom_right = 10
+	panel.add_theme_stylebox_override("panel", panel_style)
+	
+	# Title
+	var title_label = Label.new()
+	panel.add_child(title_label)
+	title_label.text = "Orbital Parameters"
+	title_label.position = Vector2(10, 10)
+	title_label.add_theme_color_override("font_color", Color.WHITE)
+	title_label.add_theme_font_size_override("font_size", 18)
+	
+	# Distance controls
+	var distance_title = Label.new()
+	panel.add_child(distance_title)
+	distance_title.text = "Starting Distance:"
+	distance_title.position = Vector2(10, 40)
+	distance_title.add_theme_color_override("font_color", Color.WHITE)
+	
+	distance_label = Label.new()
+	panel.add_child(distance_label)
+	distance_label.position = Vector2(250, 40)
+	distance_label.add_theme_color_override("font_color", Color.YELLOW)
+	update_distance_label()
+	
+	distance_slider = HSlider.new()
+	panel.add_child(distance_slider)
+	distance_slider.position = Vector2(10, 60)
+	distance_slider.size = Vector2(320, 20)
+	distance_slider.min_value = 1.0
+	distance_slider.max_value = 55.0
+	distance_slider.value = current_distance
+	distance_slider.step = 0.1
+	distance_slider.connect("value_changed", _on_distance_changed)
+	
+	# Velocity magnitude controls
+	var magnitude_title = Label.new()
+	panel.add_child(magnitude_title)
+	magnitude_title.text = "Velocity Magnitude:"
+	magnitude_title.position = Vector2(10, 90)
+	magnitude_title.add_theme_color_override("font_color", Color.WHITE)
+	
+	magnitude_label = Label.new()
+	panel.add_child(magnitude_label)
+	magnitude_label.position = Vector2(250, 90)
+	magnitude_label.add_theme_color_override("font_color", Color.YELLOW)
+	update_magnitude_label()
+	
+	magnitude_slider = HSlider.new()
+	panel.add_child(magnitude_slider)
+	magnitude_slider.position = Vector2(10, 110)
+	magnitude_slider.size = Vector2(320, 20)
+	magnitude_slider.min_value = 0.0
+	magnitude_slider.max_value = 80.0
+	magnitude_slider.value = current_velocity.length()
+	magnitude_slider.step = 0.1
+	magnitude_slider.connect("value_changed", _on_magnitude_changed)
+	
+	# Velocity direction controls
+	var velocity_title = Label.new()
+	panel.add_child(velocity_title)
+	velocity_title.text = "Velocity Direction (X, Y, Z):"
+	velocity_title.position = Vector2(10, 140)
+	velocity_title.add_theme_color_override("font_color", Color.WHITE)
+	
+	velocity_label = Label.new()
+	panel.add_child(velocity_label)
+	velocity_label.position = Vector2(10, 250)
+	velocity_label.add_theme_color_override("font_color", Color.CYAN)
+	update_velocity_label()
+	
+	# X velocity
+	var x_label = Label.new()
+	panel.add_child(x_label)
+	x_label.text = "X:"
+	x_label.position = Vector2(10, 160)
+	x_label.add_theme_color_override("font_color", Color.WHITE)
+	
+	velocity_x_slider = HSlider.new()
+	panel.add_child(velocity_x_slider)
+	velocity_x_slider.position = Vector2(30, 160)
+	velocity_x_slider.size = Vector2(200, 20)
+	velocity_x_slider.min_value = -1.0
+	velocity_x_slider.max_value = 1.0
+	velocity_x_slider.value = current_velocity.normalized().x
+	velocity_x_slider.step = 0.01
+	velocity_x_slider.connect("value_changed", _on_velocity_direction_changed)
+	
+	# Y velocity
+	var y_label = Label.new()
+	panel.add_child(y_label)
+	y_label.text = "Y:"
+	y_label.position = Vector2(10, 185)
+	y_label.add_theme_color_override("font_color", Color.WHITE)
+	
+	velocity_y_slider = HSlider.new()
+	panel.add_child(velocity_y_slider)
+	velocity_y_slider.position = Vector2(30, 185)
+	velocity_y_slider.size = Vector2(200, 20)
+	velocity_y_slider.min_value = -1.0
+	velocity_y_slider.max_value = 1.0
+	velocity_y_slider.value = current_velocity.normalized().y
+	velocity_y_slider.step = 0.01
+	velocity_y_slider.connect("value_changed", _on_velocity_direction_changed)
+	
+	# Z velocity
+	var z_label = Label.new()
+	panel.add_child(z_label)
+	z_label.text = "Z:"
+	z_label.position = Vector2(10, 210)
+	z_label.add_theme_color_override("font_color", Color.WHITE)
+	
+	velocity_z_slider = HSlider.new()
+	panel.add_child(velocity_z_slider)
+	velocity_z_slider.position = Vector2(30, 210)
+	velocity_z_slider.size = Vector2(200, 20)
+	velocity_z_slider.min_value = -1.0
+	velocity_z_slider.max_value = 1.0
+	velocity_z_slider.value = current_velocity.normalized().z
+	velocity_z_slider.step = 0.01
+	velocity_z_slider.connect("value_changed", _on_velocity_direction_changed)
+	
+	# Apply button
+	var apply_button = Button.new()
+	panel.add_child(apply_button)
+	apply_button.text = "Apply & Reset Orbit"
+	apply_button.position = Vector2(240, 160)
+	apply_button.size = Vector2(100, 60)
+	apply_button.connect("pressed", _on_apply_pressed)
 
 func _process(delta):
 	# Update physics
@@ -128,15 +287,59 @@ func update_trail_mesh():
 	array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, arrays)
 	trail_mesh.mesh = array_mesh
 
+func _on_distance_changed(value: float):
+	current_distance = value
+	update_distance_label()
+
+func _on_magnitude_changed(value: float):
+	var direction = Vector3(velocity_x_slider.value, velocity_y_slider.value, velocity_z_slider.value).normalized()
+	current_velocity = direction * value
+	update_magnitude_label()
+	update_velocity_label()
+
+func _on_velocity_direction_changed(_value: float):
+	var direction = Vector3(velocity_x_slider.value, velocity_y_slider.value, velocity_z_slider.value).normalized()
+	var magnitude = magnitude_slider.value
+	current_velocity = direction * magnitude
+	update_velocity_label()
+
+func _on_apply_pressed():
+	# Calculate starting position based on distance
+	var start_position = Vector3(current_distance, 0, 0)
+	
+	# Apply new parameters
+	gravity_sim.set_satellite(start_position, current_velocity, 1.0)
+	trail_points.clear()
+	
+	print("Applied new orbit: Distance=", current_distance, " Velocity=", current_velocity)
+
+func update_distance_label():
+	distance_label.text = "%.1f" % current_distance
+
+func update_magnitude_label():
+	magnitude_label.text = "%.2f" % current_velocity.length()
+
+func update_velocity_label():
+	velocity_label.text = "Velocity: (%.2f, %.2f, %.2f)" % [current_velocity.x, current_velocity.y, current_velocity.z]
+
 func _input(event):
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_R:
 				# Reset simulation to stable circular orbit
-				gravity_sim.set_satellite(Vector3(5, 0, 0), Vector3(0, 0, 3.16), 1.0)
-				trail_points.clear()
+				current_distance = 5.0
+				current_velocity = Vector3(0, 0, 3.16)
+				distance_slider.value = current_distance
+				magnitude_slider.value = current_velocity.length()
+				velocity_x_slider.value = 0.0
+				velocity_y_slider.value = 0.0
+				velocity_z_slider.value = 1.0
+				_on_apply_pressed()
+				update_distance_label()
+				update_magnitude_label()
+				update_velocity_label()
 			KEY_SPACE:
-				# Speed up satellite (careful not to make it too fast)
+				# Speed up satellite (slightly)
 				var current_vel = gravity_sim.get_satellite_velocity()
 				gravity_sim.set_satellite(gravity_sim.get_satellite_position(), current_vel * 1.05, 1.0)
 			KEY_B:
@@ -145,20 +348,36 @@ func _input(event):
 				gravity_sim.set_satellite(gravity_sim.get_satellite_position(), current_vel * 0.95, 1.0)
 			KEY_1:
 				# Stable circular orbit
-				gravity_sim.set_satellite(Vector3(5, 0, 0), Vector3(0, 0, 3.16), 1.0)
-				trail_points.clear()
+				current_distance = 5.0
+				current_velocity = Vector3(0, 0, 3.16)
+				_update_sliders_and_apply()
 			KEY_2:
 				# Stable elliptical orbit
-				gravity_sim.set_satellite(Vector3(5, 0, 0), Vector3(0, 0.5, 3.5), 1.0)
-				trail_points.clear()
+				current_distance = 5.0
+				current_velocity = Vector3(0, 0.5, 3.5)
+				_update_sliders_and_apply()
 			KEY_3:
 				# Stable inclined orbit
-				gravity_sim.set_satellite(Vector3(4, 2, 2), Vector3(1, 1, 2.5), 1.0)
-				trail_points.clear()
+				current_distance = 5.0
+				current_velocity = Vector3(1, 1, 2.5)
+				_update_sliders_and_apply()
 			KEY_4:
 				# High orbit (slower)
-				gravity_sim.set_satellite(Vector3(8, 0, 0), Vector3(0, 0, 2.5), 1.0)
-				trail_points.clear()
+				current_distance = 8.0
+				current_velocity = Vector3(0, 0, 2.5)
+				_update_sliders_and_apply()
 			KEY_C:
 				# Toggle camera rotation
 				set_process(not is_processing())
+
+func _update_sliders_and_apply():
+	distance_slider.value = current_distance
+	magnitude_slider.value = current_velocity.length()
+	var normalized_vel = current_velocity.normalized()
+	velocity_x_slider.value = normalized_vel.x
+	velocity_y_slider.value = normalized_vel.y
+	velocity_z_slider.value = normalized_vel.z
+	_on_apply_pressed()
+	update_distance_label()
+	update_magnitude_label()
+	update_velocity_label()
