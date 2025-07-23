@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gravity_3d_demo.gd" id="1"]
+
+[node name="Gravity3DDemo" type="Node3D"]
+script = ExtResource("1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 5, 0)
+light_energy = 0.8
+shadow_enabled = true
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Instructions" type="Label" parent="UI"]
+layout_mode = 0
+offset_right = 500.0
+offset_bottom = 200.0
+text = "3D Gravity Simulator - STABLE VERSION
+R - Reset to stable orbit
+SPACE - Speed up satellite (slightly)
+B - Brake satellite (slightly)
+1 - Circular orbit
+2 - Elliptical orbit  
+3 - Inclined orbit
+4 - High orbit (slower)
+C - Toggle camera rotation
+
+Blue sphere = Planet (with collision)
+Red sphere = Orbiting satellite
+Yellow = Satellite on collision
+Green trail = Orbit path
+
+Physics includes collision detection!"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
