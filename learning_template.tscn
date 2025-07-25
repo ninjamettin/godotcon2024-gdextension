@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://bi8ppv5m8cobp"]
+
+[ext_resource type="PackedScene" uid="uid://bi8ppv5m8cobp" path="res://learning_template.tscn" id="1_dsqmn"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_d0xdm"]
+
+[node name="LearningTemplate" instance=ExtResource("1_dsqmn")]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." index="0"]
+mesh = SubResource("SphereMesh_d0xdm")
