@@ -1,6 +1,7 @@
 #include "player.hpp"
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/classes/input_event_key.hpp>
 
 using namespace godot;
 
@@ -24,18 +25,19 @@ void Player::_physics_process(double delta) {
     if (!is_on_floor())
         velocity.y -= gravity * delta;
 
-    // Movement input
+    // Movement input - use direct keyboard input to avoid InputMap errors
+    Input* input = Input::get_singleton();
     Vector2 input_dir = Vector2(
-        Input::get_singleton()->get_action_strength("move_right") - Input::get_singleton()->get_action_strength("move_left"),
-        Input::get_singleton()->get_action_strength("move_back") - Input::get_singleton()->get_action_strength("move_forward")
+        (input->is_key_pressed(KEY_D) ? 1.0f : 0.0f) - (input->is_key_pressed(KEY_A) ? 1.0f : 0.0f),
+        (input->is_key_pressed(KEY_S) ? 1.0f : 0.0f) - (input->is_key_pressed(KEY_W) ? 1.0f : 0.0f)
     ).normalized();
 
     Vector3 direction = get_global_transform().basis.xform(Vector3(input_dir.x, 0, input_dir.y)).normalized();
     velocity.x = direction.x * speed;
     velocity.z = direction.z * speed;
 
-    // Jump
-    if (is_on_floor() && Input::get_singleton()->is_action_just_pressed("jump")) {
+    // Jump - use direct Space key input
+    if (is_on_floor() && input->is_key_pressed(KEY_SPACE)) {
         velocity.y = jump_velocity;
     }
 
