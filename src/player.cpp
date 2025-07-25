@@ -2,6 +2,7 @@
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/classes/input_event_key.hpp>
+#include <godot_cpp/classes/engine.hpp>
 
 using namespace godot;
 
@@ -19,6 +20,11 @@ void Player::_bind_methods() {
 }
 
 void Player::_physics_process(double delta) {
+    // Don't process input when in the editor
+    if (Engine::get_singleton()->is_editor_hint()) {
+        return;
+    }
+
     Vector3 velocity = get_velocity();
 
     // Gravity
