@@ -16,6 +16,7 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level)
 		return;
 	}
 	godot::ClassDB::register_class<godot::Player>();
+	godot::ClassDB::register_class<godot::Weapon>();
 	godot::ClassDB::register_class<godot::WeaponManager>();
 }
 

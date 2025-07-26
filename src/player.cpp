@@ -110,6 +110,12 @@ void Player::_physics_process(double delta) {
     Vector3 direction = (forward * input_dir.y + right * input_dir.x).normalized();
     velocity.x = direction.x * speed;
     velocity.z = direction.z * speed;
+    
+    // Update weapon manager with movement state (for bob effect)
+    bool is_moving = input_dir.length() > 0.0 && is_on_floor();
+    if (weapon_manager) {
+        weapon_manager->set_movement_state(is_moving);
+    }
 
     // Jump - use direct Space key input
     if (is_on_floor() && input->is_key_pressed(KEY_SPACE)) {
