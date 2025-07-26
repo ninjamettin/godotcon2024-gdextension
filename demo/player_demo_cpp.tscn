@@ -1,4 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://c1c2cvpwks0d6"]
+[gd_scene load_steps=7 format=3 uid="uid://c1c2cvpwks0d6"]
+
+[ext_resource type="PackedScene" uid="uid://b8m41xi6031nb" path="res://P226.glb" id="1_yhhcc"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 1
@@ -49,5 +51,11 @@ mesh = SubResource("CapsuleMesh_1")
 shape = SubResource("CapsuleShape3D_1")
 
 [node name="Camera3D" type="Camera3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 2.10636, 2.4026)
+transform = Transform3D(0.991897, -0.0477096, 0.11775, 0.0220855, 0.977452, 0.209999, -0.125114, -0.205697, 0.970585, 0.00365794, 1.14157, 2.39936)
 fov = 90.3
+
+[node name="WeaponManager" type="WeaponManager" parent="Player/Camera3D"]
+sway_intensity = 1.5
+
+[node name="P2262" parent="Player/Camera3D/WeaponManager" instance=ExtResource("1_yhhcc")]
+transform = Transform3D(1.53053, -0.191558, -0.264567, 0.100295, 1.482, -0.492811, 0.310855, 0.465002, 1.46163, 0.296869, -0.13509, -0.303368)

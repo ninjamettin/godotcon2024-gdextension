@@ -5,6 +5,8 @@
 #include <godot_cpp/classes/camera3d.hpp>
 #include <godot_cpp/classes/input_event_mouse_motion.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include "weapons/weapon_manager.hpp"
+
 
 namespace godot {
 
@@ -21,6 +23,7 @@ private:
     Camera3D* camera = nullptr;
     Vector2 mouse_rotation = Vector2(0.0, 0.0); // X = pitch, Y = yaw
     double max_pitch = 80.0; // Maximum vertical look angle in degrees
+    WeaponManager* weapon_manager = nullptr;
 
 public:
     Player() {}

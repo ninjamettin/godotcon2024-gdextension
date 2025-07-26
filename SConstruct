@@ -39,6 +39,8 @@ env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")
+sources += Glob("src/*/*.cpp")  # Include subdirectories like weapons/, combat/, etc.
+sources += Glob("src/*/*/*.cpp")  # Include deeper subdirectories like weapons/guns/
 
 if env["target"] in ["editor", "template_debug"]:
     try:

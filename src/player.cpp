@@ -30,6 +30,15 @@ void Player::_ready() {
     }
     
     setup_camera();
+
+    // Try to find existing WeaponManager first
+    weapon_manager = camera->get_node<WeaponManager>("WeaponManager");
+    if (!weapon_manager) {
+        // If not found, create one
+        weapon_manager = memnew(WeaponManager);
+        camera->add_child(weapon_manager);
+        weapon_manager->set_name("WeaponManager");
+    }
     
     // Capture the mouse for first-person controls
     Input::get_singleton()->set_mouse_mode(Input::MOUSE_MODE_CAPTURED);
@@ -54,6 +63,11 @@ void Player::_input(const Ref<InputEvent>& event) {
         mouse_rotation.x = CLAMP(mouse_rotation.x, Math::deg_to_rad(-max_pitch), Math::deg_to_rad(max_pitch));
         
         update_camera_rotation();
+    
+
+        if (weapon_manager) {
+            weapon_manager->apply_mouse_input(relative);
+        }
     }
     
     // Allow escape key to release mouse capture for testing
