@@ -18,17 +18,8 @@ void Pistol::_ready() {
     // Call parent ready first
     Weapon::_ready();
     
-    // Customize pistol-specific stats
-    set_damage(15.0);                    // Moderate damage
-    set_fire_rate(8.0);                  // 8 shots per second
-    set_max_ammo(12);                    // 12 round magazine
-    set_recoil_duration(0.1);            // Quick recoil
-    set_recoil_offset(Vector3(0, 0, 0.03)); // Light recoil movement
-    
-    // Set reload time and other stats
-    reload_time = 1.5;                   // Fast reload
-    projectile_speed = 80.0;             // High velocity
-    range = 50.0;                        // Medium range
+    // Customize pistol-specific recoil settings
+    set_recoil_amplifier(1.2);           // Slightly stronger recoil than base
     
     // TODO: Load pistol-specific assets
     // - Weapon mesh

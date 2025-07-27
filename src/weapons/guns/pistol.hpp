@@ -1,7 +1,7 @@
 #ifndef PISTOL_H
 #define PISTOL_H
 
-#include "weapon_manager.hpp"
+#include "../weapon_manager.hpp"
 
 namespace godot {
 
@@ -15,8 +15,8 @@ public:
     static void _bind_methods();
     void _ready() override;
     
-    // Override weapon behavior if needed
-    void setup_first_person_position() override;
+    // Pistol-specific methods
+    void setup_first_person_position();
 };
 
 }

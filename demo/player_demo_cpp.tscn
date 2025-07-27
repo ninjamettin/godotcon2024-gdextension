@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://c1c2cvpwks0d6"]
+[gd_scene load_steps=8 format=3 uid="uid://c1c2cvpwks0d6"]
 
 [ext_resource type="PackedScene" uid="uid://b8m41xi6031nb" path="res://P226.glb" id="1_yhhcc"]
+[ext_resource type="AnimationLibrary" uid="uid://d1f4m1ce22bim" path="res://import.res" id="2_bujyn"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 1
@@ -55,9 +56,11 @@ transform = Transform3D(0.991897, -0.0477096, 0.11775, 0.0220855, 0.977452, 0.20
 fov = 90.3
 
 [node name="WeaponManager" type="WeaponManager" parent="Player/Camera3D"]
-sway_intensity = 1.5
-bob_intensity = 0.005
-bob_frequency = 0.8
 
 [node name="P2262" parent="Player/Camera3D/WeaponManager" instance=ExtResource("1_yhhcc")]
-transform = Transform3D(1.53516, -0.158289, -0.259687, 0.119547, 1.54284, -0.233692, 0.279644, 0.209398, 1.52551, 0.296869, -0.13509, -0.303368)
+transform = Transform3D(1.56499, 0, 0, 0, 1.56501, 0, 0, 0, 1.565, 0.296869, -0.13509, -0.303368)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player/Camera3D/WeaponManager/P2262"]
+libraries = {
+&"import": ExtResource("2_bujyn")
+}
