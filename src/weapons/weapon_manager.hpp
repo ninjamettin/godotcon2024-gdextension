@@ -16,27 +16,10 @@ private:
     // Animation system
     AnimationPlayer* animation_player = nullptr;
     double animation_speed = 1.0;
-    
-    // Recoil system
-    double recoil_amplifier = 1.0;
-    bool is_in_recoil = false;
-    double current_recoil_time = 0.0;
-    
-    // Base recoil values
-    Vector3 base_slide_distance = Vector3(0, 0, -0.03);
-    Vector3 base_hammer_rotation = Vector3(-3.0, 0, 0);
-    Vector3 base_trigger_pull = Vector3(0, 0, -0.008);
-    Vector3 base_weapon_kick = Vector3(1.5, 0, 0);
-    double recoil_duration = 0.3;
-    
-    // Pistol part references
-    Node3D* pistol_slide = nullptr;
-    Node3D* pistol_hammer = nullptr;
-    Node3D* pistol_trigger = nullptr;
-    Node3D* pistol_root = nullptr;
+    double fire_rate = 5.0; // Shots per second
     
     // Sway settings
-    double sway_intensity = 1.0;
+    double sway_intensity = 2.0;
     double sway_smoothness = 5.0;
     bool enable_sway = true;
     
@@ -51,6 +34,7 @@ private:
     double bob_time = 0.0;
     double bob_offset = 0.0;
     bool is_moving = false;
+    double player_speed = 0.0; // Current player movement speed
     
     // Original position tracking
     Vector3 original_position;
@@ -67,14 +51,11 @@ public:
     // Core weapon methods
     void fire();
     void setup_weapon_parts();
-    void play_recoil_animation();
-    void update_recoil(double delta);
-    void reset_parts();
     void play_fire_animation();
     
     // Movement and input methods
     void apply_mouse_input(Vector2 mouse_delta);
-    void set_movement_state(bool moving);
+    void set_movement_state(bool moving, double speed = 0.0);
     void handle_shoot_input(bool pressed);
     
     // Property getters/setters
@@ -90,10 +71,10 @@ public:
     void set_enable_sway(bool enable) { enable_sway = enable; }
     bool get_enable_bob() const { return enable_bob; }
     void set_enable_bob(bool enable) { enable_bob = enable; }
-    double get_recoil_amplifier() const { return recoil_amplifier; }
-    void set_recoil_amplifier(double amplifier) { recoil_amplifier = amplifier; }
     double get_animation_speed() const { return animation_speed; }
     void set_animation_speed(double speed) { animation_speed = speed; }
+    double get_fire_rate() const { return fire_rate; }
+    void set_fire_rate(double rate) { fire_rate = rate; }
 
 private:
     void update_sway(double delta);

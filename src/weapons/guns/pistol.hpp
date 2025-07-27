@@ -8,6 +8,8 @@ namespace godot {
 class Pistol : public WeaponManager {
     GDCLASS(Pistol, WeaponManager)
 
+private:
+    double fire_rate = 1.0;
 public:
     Pistol();
     ~Pistol();
@@ -17,6 +19,8 @@ public:
     
     // Pistol-specific methods
     void setup_first_person_position();
+
+
 };
 
 } // namespace godot

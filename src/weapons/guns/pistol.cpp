@@ -18,19 +18,15 @@ void Pistol::_ready() {
     // Call parent ready first
     WeaponManager::_ready();
     
-    // Customize pistol-specific recoil settings
-    set_recoil_amplifier(1.2);           // Slightly stronger recoil than base
+    // Set pistol-specific properties
+    set_fire_rate(8.0);                  // 8 shots per second
+    set_animation_speed(1.0);            // Normal animation speed multiplier
     
-    // TODO: Load pistol-specific assets
-    // - Weapon mesh
-    // - Animation player
-    // - Audio files
-    // - Muzzle flash effects
+    UtilityFunctions::print("Pistol: Setup complete with fire rate ", fire_rate);
 }
 
 void Pistol::setup_first_person_position() {
     // TODO: Position pistol for first-person view
     // This might include specific offset and rotation
-    set_position(Vector3(0.3, -0.2, -0.5)); // Right-handed position
-    set_rotation_degrees(Vector3(0, -5, 0)); // Slight angle
+    set_position(Vector3(0.297, -0.135, -0.303)); // Right-handed position
 }
