@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3 uid="uid://cnrsk1ximff5l"]
+
+[ext_resource type="PackedScene" uid="uid://b8m41xi6031nb" path="res://P226.glb" id="1_nlgr8"]
+[ext_resource type="Animation" uid="uid://gu6n5je2vukn" path="res://bin/animations/pistol_shoot.res" id="2_ljyfo"]
+
+[sub_resource type="Animation" id="Animation_ij1m1"]
+length = 0.001
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4b1b3"]
+_data = {
+&"RESET": SubResource("Animation_ij1m1")
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vpcml"]
+_data = {
+&"pistol_shoot_2": ExtResource("2_ljyfo")
+}
+
+[node name="P2262" instance=ExtResource("1_nlgr8")]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+
+[node name="P226" parent="." index="0"]
+transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1"]
+libraries = {
+&"": SubResource("AnimationLibrary_4b1b3"),
+&"newnew": SubResource("AnimationLibrary_vpcml")
+}
+speed_scale = 0.1

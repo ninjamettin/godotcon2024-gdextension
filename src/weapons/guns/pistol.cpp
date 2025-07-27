@@ -1,5 +1,6 @@
 #include "pistol.hpp"
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
 
 using namespace godot;
 
@@ -10,36 +11,21 @@ Pistol::~Pistol() {
 }
 
 void Pistol::_bind_methods() {
-    // Call parent bind methods - individual weapon properties 
-    // are exposed through the base Weapon class
+    // No additional methods to bind for simplified pistol
 }
 
 void Pistol::_ready() {
     // Call parent ready first
     Weapon::_ready();
     
-    // Customize pistol-specific stats
-    set_damage(15.0);                    // Moderate damage
-    set_fire_rate(8.0);                  // 8 shots per second
-    set_max_ammo(12);                    // 12 round magazine
-    set_recoil_duration(0.1);            // Quick recoil
-    set_recoil_offset(Vector3(0, 0, 0.03)); // Light recoil movement
+    // Set pistol-specific recoil amplifier
+    set_recoil_amplifier(1.2); // Slightly higher recoil than default
     
-    // Set reload time and other stats
-    reload_time = 1.5;                   // Fast reload
-    projectile_speed = 80.0;             // High velocity
-    range = 50.0;                        // Medium range
-    
-    // TODO: Load pistol-specific assets
-    // - Weapon mesh
-    // - Animation player
-    // - Audio files
-    // - Muzzle flash effects
+    UtilityFunctions::print("Pistol: Ready with recoil amplifier ", get_recoil_amplifier());
 }
 
 void Pistol::setup_first_person_position() {
-    // TODO: Position pistol for first-person view
-    // This might include specific offset and rotation
+    // Position pistol for first-person view
     set_position(Vector3(0.3, -0.2, -0.5)); // Right-handed position
     set_rotation_degrees(Vector3(0, -5, 0)); // Slight angle
 }

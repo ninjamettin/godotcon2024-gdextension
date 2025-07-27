@@ -55,9 +55,14 @@ transform = Transform3D(0.991897, -0.0477096, 0.11775, 0.0220855, 0.977452, 0.20
 fov = 90.3
 
 [node name="WeaponManager" type="WeaponManager" parent="Player/Camera3D"]
-sway_intensity = 1.5
-bob_intensity = 0.005
-bob_frequency = 0.8
+sway_intensity = 2.1
+bob_intensity = 0.039
 
-[node name="P2262" parent="Player/Camera3D/WeaponManager" instance=ExtResource("1_yhhcc")]
-transform = Transform3D(1.53516, -0.158289, -0.259687, 0.119547, 1.54284, -0.233692, 0.279644, 0.209398, 1.52551, 0.296869, -0.13509, -0.303368)
+[node name="Pistol" type="Pistol" parent="Player/Camera3D/WeaponManager"]
+transform = Transform3D(0.991897, 0.0220855, -0.125114, -0.0477097, 0.977452, -0.205697, 0.11775, 0.209999, 0.970585, 0.296869, -0.13509, -0.303368)
+
+[node name="P2262" parent="Player/Camera3D/WeaponManager/Pistol" instance=ExtResource("1_yhhcc")]
+transform = Transform3D(1.55232, -0.0746661, 0.184279, 0.0345638, 1.52972, 0.328649, -0.195803, -0.321918, 1.51897, 0.296869, -0.13509, -0.303368)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player/Camera3D/WeaponManager/Pistol"]
+root_node = NodePath("../P2262")

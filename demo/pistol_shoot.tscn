@@ -1,0 +1,130 @@
+[gd_scene load_steps=8 format=3 uid="uid://ctww04ita22gn"]
+
+[ext_resource type="PackedScene" uid="uid://b8m41xi6031nb" path="res://P226.glb" id="1_oi4gf"]
+[ext_resource type="AnimationLibrary" path="res://pistol_shoot.res" id="2_5bonk"]
+[ext_resource type="Animation" uid="uid://gu6n5je2vukn" path="res://bin/animations/pistol_shoot.res" id="2_57jjt"]
+
+[sub_resource type="Animation" id="Animation_oi4gf"]
+length = 0.001
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+
+[sub_resource type="Animation" id="Animation_8u5uf"]
+resource_name = "pistol_shoot"
+length = 0.2
+tracks/0/type = "rotation_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("P226/Hammer")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.0666667, 1, -0.0943081, 0, 0, 0.995543, 0.1, 1, 0.0150759, 0, 0, 0.999886, 0.141839, 1, 0.0150759, 0, 0, 0.999886, 0.159, 1, 0, 0, 0, 1)
+tracks/1/type = "position_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("P226/slide")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0.0666667, 1, 0, 0, 0, 0.12206, 1, 0, 3.55551, -4.23849e-07, 0.1846, 1, 0, 0, 0)
+tracks/2/type = "rotation_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("P226/Trigger")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.0667, 1, -0.153339, 0, 0, 0.988174, 0.142752, 1, -0.153339, 0, 0, 0.988174, 0.1846, 1, 0, 0, 0, 1)
+tracks/3/type = "position_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("P226/Trigger")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.0666667, 1, 0, 0.982, 0, 0.141878, 1, 0, 0.982, 0, 0.1846, 1, 0, 0, 0)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0.296869, -0.13509, -0.303368, 0.122924, 1, 0.296869, -0.13509, -0.303368, 0.136963, 1, 0.297, -0.14, -0.308, 0.160302, 1, 0.296869, -0.13509, -0.303368)
+tracks/5/type = "rotation_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.123529, 1, 0, 0, 0, 1, 0.136421, 1, 0.0307653, 0, 0, 0.999527, 0.159697, 1, 0, 0, 0, 1)
+
+[sub_resource type="Animation" id="Animation_57jjt"]
+resource_name = "pistol_shoot_3"
+length = 0.2
+tracks/0/type = "rotation_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("P226/Hammer")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.0666667, 1, -0.0943081, 0, 0, 0.995543, 0.1, 1, 0.0150759, 0, 0, 0.999886, 0.141839, 1, 0.0150759, 0, 0, 0.999886, 0.159, 1, 0, 0, 0, 1)
+tracks/1/type = "position_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("P226/slide")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0.0666667, 1, 0, 0, 0, 0.12206, 1, 0, 3.55551, -4.23849e-07, 0.1846, 1, 0, 0, 0)
+tracks/2/type = "rotation_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("P226/Trigger")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.0667, 1, -0.153339, 0, 0, 0.988174, 0.142752, 1, -0.153339, 0, 0, 0.988174, 0.1846, 1, 0, 0, 0, 1)
+tracks/3/type = "position_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("P226/Trigger")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.0666667, 1, 0, 0.982, 0, 0.141878, 1, 0, 0.982, 0, 0.1846, 1, 0, 0, 0)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.122924, 1, 0, 0, 0, 0.140085, 1, 0, 0.02, 0.02, 0.166667, 1, 0, 0, 0)
+tracks/5/type = "rotation_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.123529, 1, 0, 0, 0, 1, 0.140551, 1, 0.31334, -0.0730834, 0.00143408, 0.946823, 0.166667, 1, 0, 0, 0, 1)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_k01ry"]
+_data = {
+&"RESET": SubResource("Animation_oi4gf"),
+&"pistol_shoot": SubResource("Animation_8u5uf"),
+&"pistol_shoot_2": ExtResource("2_57jjt"),
+&"pistol_shoot_3": SubResource("Animation_57jjt")
+}
+
+[node name="P2262" instance=ExtResource("1_oi4gf")]
+
+[node name="P226" parent="." index="0"]
+transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0)
+
+[node name="slide" parent="P226" index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, -1.42109e-14, 0, 1.42109e-14, 1, 0, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1"]
+libraries = {
+&"": SubResource("AnimationLibrary_k01ry"),
+&"new": ExtResource("2_5bonk")
+}
+speed_scale = 0.1

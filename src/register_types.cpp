@@ -7,6 +7,7 @@
 
 #include "player.hpp"
 #include "weapons/weapon_manager.hpp"
+#include "weapons/guns/pistol.hpp"
 
 using namespace godot;
 
@@ -18,6 +19,7 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level)
 	godot::ClassDB::register_class<godot::Player>();
 	godot::ClassDB::register_class<godot::Weapon>();
 	godot::ClassDB::register_class<godot::WeaponManager>();
+	godot::ClassDB::register_class<godot::Pistol>();
 }
 
 void uninitialize_gdextension_types(ModuleInitializationLevel p_level) {
