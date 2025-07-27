@@ -5,13 +5,13 @@
 
 namespace godot {
 
-class Pistol : public Weapon {
-    GDCLASS(Pistol, Weapon)
+class Pistol : public WeaponManager {
+    GDCLASS(Pistol, WeaponManager)
 
 public:
     Pistol();
     ~Pistol();
-    
+
     static void _bind_methods();
     void _ready() override;
     
@@ -19,6 +19,6 @@ public:
     void setup_first_person_position();
 };
 
-}
+} // namespace godot
 
 #endif

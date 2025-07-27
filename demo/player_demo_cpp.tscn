@@ -57,13 +57,10 @@ fov = 90.3
 
 [node name="WeaponManager" type="WeaponManager" parent="Player/Camera3D"]
 
-[node name="Weapon" type="Weapon" parent="Player/Camera3D/WeaponManager"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-
-[node name="P2262" parent="Player/Camera3D/WeaponManager/Weapon" instance=ExtResource("1_yhhcc")]
+[node name="P2262" parent="Player/Camera3D/WeaponManager" instance=ExtResource("1_yhhcc")]
 transform = Transform3D(1.56499, 0, 0, 0, 1.56501, 0, 0, 0, 1.565, 0.296869, -0.13509, -0.303368)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Player/Camera3D/WeaponManager/Weapon/P2262"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player/Camera3D/WeaponManager/P2262"]
 libraries = {
 &"import": ExtResource("2_bujyn")
 }

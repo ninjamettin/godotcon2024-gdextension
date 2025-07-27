@@ -16,7 +16,7 @@ void Pistol::_bind_methods() {
 
 void Pistol::_ready() {
     // Call parent ready first
-    Weapon::_ready();
+    WeaponManager::_ready();
     
     // Customize pistol-specific recoil settings
     set_recoil_amplifier(1.2);           // Slightly stronger recoil than base

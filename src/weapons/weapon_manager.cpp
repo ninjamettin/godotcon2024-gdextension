@@ -7,36 +7,85 @@
 
 using namespace godot;
 
-// ================ WEAPON CLASS ================
-
-Weapon::Weapon() {
+WeaponManager::WeaponManager() {
+    // Initialize all properties with default values
     recoil_amplifier = 1.0;
     is_in_recoil = false;
     current_recoil_time = 0.0;
+    animation_speed = 1.0;
+    
+    sway_intensity = 1.0;
+    sway_smoothness = 5.0;
+    enable_sway = true;
+    bob_intensity = 0.005;
+    bob_frequency = 0.8;
+    enable_bob = true;
 }
 
-Weapon::~Weapon() {}
+WeaponManager::~WeaponManager() {}
 
-void Weapon::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("fire"), &Weapon::fire);
-    ClassDB::bind_method(D_METHOD("setup_pistol_parts"), &Weapon::setup_pistol_parts);
-    ClassDB::bind_method(D_METHOD("play_fire_animation"), &Weapon::play_fire_animation);
-    ClassDB::bind_method(D_METHOD("get_recoil_amplifier"), &Weapon::get_recoil_amplifier);
-    ClassDB::bind_method(D_METHOD("set_recoil_amplifier", "amplifier"), &Weapon::set_recoil_amplifier);
+void WeaponManager::_bind_methods() {
+    // Core weapon methods
+    ClassDB::bind_method(D_METHOD("fire"), &WeaponManager::fire);
+    ClassDB::bind_method(D_METHOD("setup_weapon_parts"), &WeaponManager::setup_weapon_parts);
+    ClassDB::bind_method(D_METHOD("play_fire_animation"), &WeaponManager::play_fire_animation);
+    
+    // Movement and input methods
+    ClassDB::bind_method(D_METHOD("apply_mouse_input", "mouse_delta"), &WeaponManager::apply_mouse_input);
+    ClassDB::bind_method(D_METHOD("set_movement_state", "moving"), &WeaponManager::set_movement_state);
+    ClassDB::bind_method(D_METHOD("handle_shoot_input", "pressed"), &WeaponManager::handle_shoot_input);
+    
+    // Property getters/setters
+    ClassDB::bind_method(D_METHOD("get_sway_intensity"), &WeaponManager::get_sway_intensity);
+    ClassDB::bind_method(D_METHOD("set_sway_intensity", "intensity"), &WeaponManager::set_sway_intensity);
+    ClassDB::bind_method(D_METHOD("get_sway_smoothness"), &WeaponManager::get_sway_smoothness);
+    ClassDB::bind_method(D_METHOD("set_sway_smoothness", "smoothness"), &WeaponManager::set_sway_smoothness);
+    ClassDB::bind_method(D_METHOD("get_bob_intensity"), &WeaponManager::get_bob_intensity);
+    ClassDB::bind_method(D_METHOD("set_bob_intensity", "intensity"), &WeaponManager::set_bob_intensity);
+    ClassDB::bind_method(D_METHOD("get_bob_frequency"), &WeaponManager::get_bob_frequency);
+    ClassDB::bind_method(D_METHOD("set_bob_frequency", "frequency"), &WeaponManager::set_bob_frequency);
+    ClassDB::bind_method(D_METHOD("get_enable_sway"), &WeaponManager::get_enable_sway);
+    ClassDB::bind_method(D_METHOD("set_enable_sway", "enable"), &WeaponManager::set_enable_sway);
+    ClassDB::bind_method(D_METHOD("get_enable_bob"), &WeaponManager::get_enable_bob);
+    ClassDB::bind_method(D_METHOD("set_enable_bob", "enable"), &WeaponManager::set_enable_bob);
+    ClassDB::bind_method(D_METHOD("get_recoil_amplifier"), &WeaponManager::get_recoil_amplifier);
+    ClassDB::bind_method(D_METHOD("set_recoil_amplifier", "amplifier"), &WeaponManager::set_recoil_amplifier);
+    ClassDB::bind_method(D_METHOD("get_animation_speed"), &WeaponManager::get_animation_speed);
+    ClassDB::bind_method(D_METHOD("set_animation_speed", "speed"), &WeaponManager::set_animation_speed);
+    
+    // Expose properties to the editor
+    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "animation_speed", PROPERTY_HINT_RANGE, "0.1,5.0,0.1"), "set_animation_speed", "get_animation_speed");
+    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "recoil_amplifier", PROPERTY_HINT_RANGE, "0.1,3.0,0.1"), "set_recoil_amplifier", "get_recoil_amplifier");
+    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "sway_intensity", PROPERTY_HINT_RANGE, "0.0,5.0,0.1"), "set_sway_intensity", "get_sway_intensity");
+    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "sway_smoothness", PROPERTY_HINT_RANGE, "0.1,20.0,0.1"), "set_sway_smoothness", "get_sway_smoothness");
+    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::BOOL, "enable_sway"), "set_enable_sway", "get_enable_sway");
+    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "bob_intensity", PROPERTY_HINT_RANGE, "0.0,0.1,0.001"), "set_bob_intensity", "get_bob_intensity");
+    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "bob_frequency", PROPERTY_HINT_RANGE, "0.1,5.0,0.1"), "set_bob_frequency", "get_bob_frequency");
+    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::BOOL, "enable_bob"), "set_enable_bob", "get_enable_bob");
 }
 
-void Weapon::_ready() {
-    setup_pistol_parts();
+void WeaponManager::_ready() {
+    setup_weapon_parts();
+    store_position();
 }
 
-void Weapon::_process(double delta) {
+void WeaponManager::_process(double delta) {
     if (is_in_recoil) {
         update_recoil(delta);
     }
+    if (enable_sway) update_sway(delta);
+    if (enable_bob) update_bob(delta);
 }
 
-void Weapon::setup_pistol_parts() {
-    UtilityFunctions::print("Weapon: Starting setup_pistol_parts for node: ", get_name());
+void WeaponManager::_input(const Ref<InputEvent>& event) {
+    Ref<InputEventMouseButton> mouse_button = event;
+    if (mouse_button.is_valid() && mouse_button->get_button_index() == MOUSE_BUTTON_LEFT) {
+        handle_shoot_input(mouse_button->is_pressed());
+    }
+}
+
+void WeaponManager::setup_weapon_parts() {
+    UtilityFunctions::print("WeaponManager: Starting setup for node: ", get_name());
     
     // Find pistol parts in the scene
     pistol_root = this;
@@ -44,49 +93,62 @@ void Weapon::setup_pistol_parts() {
     pistol_hammer  = Object::cast_to<MeshInstance3D>(get_node_or_null("Hammer"));
     pistol_trigger = Object::cast_to<MeshInstance3D>(get_node_or_null("Trigger"));
 
-    // Find AnimationPlayer - check in children recursively
-    animation_player = Object::cast_to<AnimationPlayer>(get_node_or_null("AnimationPlayer"));
-    if (!animation_player) {
-        // Try to find in child nodes (P2262/AnimationPlayer path)
-        Node* pistol_model = get_node_or_null("P2262");
-        if (pistol_model) {
-            UtilityFunctions::print("Weapon: Found P2262 node, looking for AnimationPlayer");
-            animation_player = Object::cast_to<AnimationPlayer>(pistol_model->get_node_or_null("AnimationPlayer"));
-        } else {
-            UtilityFunctions::print("Weapon: No P2262 node found");
-        }
-    }
-    
-    // Print all children to help debug
-    UtilityFunctions::print("Weapon: Node children count: ", get_child_count());
-    for (int i = 0; i < get_child_count(); i++) {
-        Node* child = get_child(i);
-        UtilityFunctions::print("Weapon: Child ", i, ": ", child->get_name(), " (", child->get_class(), ")");
-        
-        // Check if any child has AnimationPlayer
-        for (int j = 0; j < child->get_child_count(); j++) {
-            Node* grandchild = child->get_child(j);
-            UtilityFunctions::print("Weapon:   Grandchild ", j, ": ", grandchild->get_name(), " (", grandchild->get_class(), ")");
-        }
+    // Find AnimationPlayer in P2262 child node
+    Node* pistol_model = get_node_or_null("P2262");
+    if (pistol_model) {
+        UtilityFunctions::print("WeaponManager: Found P2262 node");
+        animation_player = Object::cast_to<AnimationPlayer>(pistol_model->get_node_or_null("AnimationPlayer"));
+    } else {
+        UtilityFunctions::print("WeaponManager: No P2262 node found");
     }
     
     if (animation_player) {
-        UtilityFunctions::print("Weapon: Found AnimationPlayer");
+        UtilityFunctions::print("WeaponManager: Found AnimationPlayer");
         PackedStringArray animations = animation_player->get_animation_list();
-        UtilityFunctions::print("Weapon: Available animations: ", animations);
+        UtilityFunctions::print("WeaponManager: Available animations: ", animations);
     } else {
-        UtilityFunctions::print("Weapon: AnimationPlayer not found");
+        UtilityFunctions::print("WeaponManager: AnimationPlayer not found");
     }
     
-    UtilityFunctions::print("Weapon: Setup pistol parts complete");
+    UtilityFunctions::print("WeaponManager: Setup complete");
 }
 
-void Weapon::fire() {
+void WeaponManager::fire() {
+    UtilityFunctions::print("WeaponManager: Fire called");
     play_recoil_animation();
     play_fire_animation();
 }
 
-void Weapon::play_recoil_animation() {
+void WeaponManager::play_fire_animation() {
+    if (animation_player) {
+        // Set the animation speed before playing
+        animation_player->set_speed_scale(animation_speed);
+        
+        // Try common animation names
+        if (animation_player->has_animation("pistol_shoot")) {
+            animation_player->play("pistol_shoot");
+            UtilityFunctions::print("WeaponManager: Playing 'pistol_shoot' at speed ", animation_speed);
+        } else if (animation_player->has_animation("shoot")) {
+            animation_player->play("shoot");
+            UtilityFunctions::print("WeaponManager: Playing 'shoot' at speed ", animation_speed);
+        } else if (animation_player->has_animation("Fire")) {
+            animation_player->play("Fire");
+            UtilityFunctions::print("WeaponManager: Playing 'Fire' at speed ", animation_speed);
+        } else {
+            // Play the first animation if any exist
+            PackedStringArray animations = animation_player->get_animation_list();
+            if (animations.size() > 0) {
+                String first_anim = animations[0];
+                animation_player->play(first_anim);
+                UtilityFunctions::print("WeaponManager: Playing first animation '", first_anim, "' at speed ", animation_speed);
+            }
+        }
+    } else {
+        UtilityFunctions::print("WeaponManager: No AnimationPlayer found");
+    }
+}
+
+void WeaponManager::play_recoil_animation() {
     if (is_in_recoil) {
         reset_parts(); // Reset if already recoiling
     }
@@ -120,11 +182,9 @@ void Weapon::play_recoil_animation() {
     
     is_in_recoil = true;
     current_recoil_time = 0.0;
-    
-    UtilityFunctions::print("Weapon: Recoil animation started with amplifier ", recoil_amplifier);
 }
 
-void Weapon::update_recoil(double delta) {
+void WeaponManager::update_recoil(double delta) {
     current_recoil_time += delta;
     
     if (current_recoil_time >= recoil_duration) {
@@ -162,7 +222,7 @@ void Weapon::update_recoil(double delta) {
     }
 }
 
-void Weapon::reset_parts() {
+void WeaponManager::reset_parts() {
     if (pistol_slide) pistol_slide->set_position(Vector3(0, 0, 0));
     if (pistol_hammer) pistol_hammer->set_rotation_degrees(Vector3(0, 0, 0));
     if (pistol_trigger) pistol_trigger->set_position(Vector3(0, 0, 0));
@@ -172,144 +232,26 @@ void Weapon::reset_parts() {
     current_recoil_time = 0.0;
 }
 
-void Weapon::play_fire_animation() {
-    if (animation_player) {
-        // Try common animation names - replace "fire" with your animation name
-        if (animation_player->has_animation("pistol_shoot")) {
-            animation_player->play("pistol_shoot");
-            UtilityFunctions::print("Weapon: Playing 'pistol_shoot' animation");
-        } else if (animation_player->has_animation("shoot")) {
-            animation_player->play("shoot");
-            UtilityFunctions::print("Weapon: Playing 'shoot' animation");
-        } else if (animation_player->has_animation("Fire")) {
-            animation_player->play("Fire");
-            UtilityFunctions::print("Weapon: Playing 'Fire' animation");
-        } else {
-            // Print available animations to help debug
-            PackedStringArray animations = animation_player->get_animation_list();
-            UtilityFunctions::print("Weapon: Available animations: ", animations);
-            
-            // Play the first animation if any exist
-            if (animations.size() > 0) {
-                String first_anim = animations[0];
-                animation_player->play(first_anim);
-                UtilityFunctions::print("Weapon: Playing first available animation: ", first_anim);
-            }
-        }
-    } else {
-        UtilityFunctions::print("Weapon: No AnimationPlayer found for fire animation");
-    }
+void WeaponManager::handle_shoot_input(bool pressed) {
+    if (!pressed) return;
+    fire();
 }
 
-// ================ WEAPON MANAGER CLASS ================
-
-WeaponManager::WeaponManager() {
-    sway_intensity = 1.0;
-    sway_smoothness = 5.0;
-    enable_sway = true;
-    bob_intensity = 0.005;
-    bob_frequency = 0.8;
-    enable_bob = true;
-}
-
-WeaponManager::~WeaponManager() {}
-
-void WeaponManager::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("apply_mouse_input", "mouse_delta"), &WeaponManager::apply_mouse_input);
-    ClassDB::bind_method(D_METHOD("set_movement_state", "moving"), &WeaponManager::set_movement_state);
-    ClassDB::bind_method(D_METHOD("handle_shoot_input", "pressed"), &WeaponManager::handle_shoot_input);
-    ClassDB::bind_method(D_METHOD("set_weapon_recoil_amplifier", "weapon_index", "amplifier"), &WeaponManager::set_weapon_recoil_amplifier);
-    
-    ClassDB::bind_method(D_METHOD("get_sway_intensity"), &WeaponManager::get_sway_intensity);
-    ClassDB::bind_method(D_METHOD("set_sway_intensity", "intensity"), &WeaponManager::set_sway_intensity);
-    ClassDB::bind_method(D_METHOD("get_bob_intensity"), &WeaponManager::get_bob_intensity);
-    ClassDB::bind_method(D_METHOD("set_bob_intensity", "intensity"), &WeaponManager::set_bob_intensity);
-    ClassDB::bind_method(D_METHOD("get_enable_sway"), &WeaponManager::get_enable_sway);
-    ClassDB::bind_method(D_METHOD("set_enable_sway", "enable"), &WeaponManager::set_enable_sway);
-    ClassDB::bind_method(D_METHOD("get_enable_bob"), &WeaponManager::get_enable_bob);
-    ClassDB::bind_method(D_METHOD("set_enable_bob", "enable"), &WeaponManager::set_enable_bob);
-    ClassDB::bind_method(D_METHOD("get_sway_smoothness"), &WeaponManager::get_sway_smoothness);
-    ClassDB::bind_method(D_METHOD("set_sway_smoothness", "smoothness"), &WeaponManager::set_sway_smoothness);
-    ClassDB::bind_method(D_METHOD("get_bob_frequency"), &WeaponManager::get_bob_frequency);
-    ClassDB::bind_method(D_METHOD("set_bob_frequency", "frequency"), &WeaponManager::set_bob_frequency);
-    
-    // Expose properties to the editor
-    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "sway_intensity", PROPERTY_HINT_RANGE, "0.0,5.0,0.1"), "set_sway_intensity", "get_sway_intensity");
-    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "sway_smoothness", PROPERTY_HINT_RANGE, "0.1,20.0,0.1"), "set_sway_smoothness", "get_sway_smoothness");
-    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::BOOL, "enable_sway"), "set_enable_sway", "get_enable_sway");
-    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "bob_intensity", PROPERTY_HINT_RANGE, "0.0,0.1,0.001"), "set_bob_intensity", "get_bob_intensity");
-    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "bob_frequency", PROPERTY_HINT_RANGE, "0.1,5.0,0.1"), "set_bob_frequency", "get_bob_frequency");
-    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::BOOL, "enable_bob"), "set_enable_bob", "get_enable_bob");
-}
-
-void WeaponManager::_ready() {
-    store_positions();
-}
-
-void WeaponManager::_process(double delta) {
-    if (enable_sway) update_sway(delta);
-    if (enable_bob) update_bob(delta);
-}
-
-void WeaponManager::_input(const Ref<InputEvent>& event) {
-    Ref<InputEventMouseButton> mouse_button = event;
-    if (mouse_button.is_valid() && mouse_button->get_button_index() == MOUSE_BUTTON_LEFT) {
-        UtilityFunctions::print("WeaponManager: Left mouse button detected, pressed = ", mouse_button->is_pressed());
-        handle_shoot_input(mouse_button->is_pressed());
-    }
-}
-
-void WeaponManager::store_positions() {
-    weapon_children.clear();
-    original_positions.clear();
-    
-    UtilityFunctions::print("WeaponManager: Starting to store positions...");
-    
-    for (int i = 0; i < get_child_count(); i++) {
-        Node* child = get_child(i);
-        UtilityFunctions::print("WeaponManager: Found child ", i, " with name: ", child->get_name(), " type: ", child->get_class());
-        
-        Node3D* child_3d = Object::cast_to<Node3D>(child);
-        if (child_3d) {
-            weapon_children.append(child_3d);
-            original_positions.append(child_3d->get_position());
-            UtilityFunctions::print("WeaponManager: Added Node3D child: ", child->get_name());
-            
-            // Check if it's a Weapon
-            Weapon* weapon = Object::cast_to<Weapon>(child);
-            if (weapon) {
-                UtilityFunctions::print("WeaponManager: Child is a Weapon class: ", child->get_name());
-            } else {
-                UtilityFunctions::print("WeaponManager: Child is NOT a Weapon class: ", child->get_name());
-            }
-        } else {
-            UtilityFunctions::print("WeaponManager: Child is not Node3D: ", child->get_name());
-        }
-    }
-    
-    UtilityFunctions::print("WeaponManager: Stored ", weapon_children.size(), " weapon positions");
+void WeaponManager::store_position() {
+    original_position = get_position();
+    UtilityFunctions::print("WeaponManager: Stored original position");
 }
 
 void WeaponManager::apply_mouse_input(Vector2 mouse_delta) {
     if (!enable_sway) return;
-    
     target_sway = mouse_delta * sway_intensity * 0.001;
 }
 
 void WeaponManager::update_sway(double delta) {
     current_sway = current_sway.lerp(target_sway, sway_smoothness * delta);
     
-    for (int i = 0; i < weapon_children.size(); i++) {
-        Variant weapon_variant = weapon_children[i];
-        Node3D* weapon = Object::cast_to<Node3D>(weapon_variant);
-        Variant pos_variant = original_positions[i];
-        Vector3 original_pos = pos_variant;
-        
-        if (weapon) {
-            Vector3 sway_offset = Vector3(current_sway.x, current_sway.y, 0);
-            weapon->set_position(original_pos + sway_offset);
-        }
-    }
+    Vector3 sway_offset = Vector3(current_sway.x, current_sway.y, 0);
+    set_position(original_position + sway_offset);
     
     // Decay sway toward zero
     target_sway = target_sway.lerp(Vector2(0, 0), delta * 2.0);
@@ -327,49 +269,7 @@ void WeaponManager::update_bob(double delta) {
         bob_offset = Math::lerp(bob_offset, 0.0, delta * 5.0);
     }
     
-    for (int i = 0; i < weapon_children.size(); i++) {
-        Variant weapon_variant = weapon_children[i];
-        Node3D* weapon = Object::cast_to<Node3D>(weapon_variant);
-        Variant pos_variant = original_positions[i];
-        Vector3 original_pos = pos_variant;
-        
-        if (weapon) {
-            Vector3 current_pos = weapon->get_position();
-            current_pos.y = original_pos.y + bob_offset;
-            weapon->set_position(current_pos);
-        }
-    }
-}
-
-void WeaponManager::handle_shoot_input(bool pressed) {
-    UtilityFunctions::print("WeaponManager: handle_shoot_input called with pressed = ", pressed);
-    
-    if (!pressed) return;
-    
-    UtilityFunctions::print("WeaponManager: Processing shoot input for ", weapon_children.size(), " children");
-    
-    for (int i = 0; i < weapon_children.size(); i++) {
-        Variant weapon_variant = weapon_children[i];
-        Node* node = Object::cast_to<Node>(weapon_variant);
-        UtilityFunctions::print("WeaponManager: Checking child ", i, " name: ", node ? node->get_name() : "null");
-        
-        Weapon* weapon = Object::cast_to<Weapon>(weapon_variant);
-        if (weapon) {
-            UtilityFunctions::print("WeaponManager: Found Weapon, calling fire()");
-            weapon->fire();
-        } else {
-            UtilityFunctions::print("WeaponManager: Child is not a Weapon class");
-        }
-    }
-}
-
-void WeaponManager::set_weapon_recoil_amplifier(int weapon_index, double amplifier) {
-    if (weapon_index < 0 || weapon_index >= weapon_children.size()) return;
-    
-    Variant weapon_variant = weapon_children[weapon_index];
-    Weapon* weapon = Object::cast_to<Weapon>(weapon_variant);
-    if (weapon) {
-        weapon->set_recoil_amplifier(amplifier);
-        UtilityFunctions::print("WeaponManager: Set recoil amplifier for weapon ", weapon_index, " to ", amplifier);
-    }
+    Vector3 current_pos = get_position();
+    current_pos.y = original_position.y + bob_offset;
+    set_position(current_pos);
 }
