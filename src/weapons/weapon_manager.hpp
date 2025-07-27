@@ -4,6 +4,9 @@
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/classes/animation_player.hpp>
 #include <godot_cpp/classes/input_event.hpp>
+#include <godot_cpp/classes/mesh_instance3d.hpp>
+#include <godot_cpp/classes/sphere_mesh.hpp>
+#include <godot_cpp/classes/standard_material3d.hpp>
 #include <godot_cpp/core/class_db.hpp>
 
 namespace godot {
@@ -36,6 +39,24 @@ private:
     
     // Original position tracking
     Vector3 original_position;
+    
+    // Muzzle flash and projectile system
+    Vector3 muzzle_offset = Vector3(0.026, -9.13, -4.14); // Relative to gun model
+    MeshInstance3D* muzzle_flash = nullptr;
+    double muzzle_flash_timer = 0.0;
+    double muzzle_flash_duration = 0.05; // 50ms flash
+    
+    // Flying ray/projectile system
+    struct FlyingRay {
+        MeshInstance3D* visual = nullptr;
+        Vector3 position;
+        Vector3 direction;
+        double speed = 1000.0; // Units per second
+        double lifetime = 3.0; // Max 3 seconds in air
+        double current_time = 0.0;
+    };
+    // We'll use a simple array of rays for now
+    // TypedArray<Ref<RefCounted>> flying_rays; // Store flying rays
 
 public:
     WeaponManager();
@@ -55,6 +76,13 @@ public:
     void apply_mouse_input(Vector2 mouse_delta);
     void set_movement_state(bool moving, double speed = 0.0);
     void handle_shoot_input(bool pressed);
+    
+    // Muzzle flash and projectile methods
+    void create_muzzle_flash();
+    void update_muzzle_flash(double delta);
+    void fire_projectile();
+    void update_flying_rays(double delta);
+    Vector3 get_muzzle_world_position();
     
     // Property getters/setters
     double get_sway_intensity() const { return sway_intensity; }
@@ -76,6 +104,7 @@ private:
     void update_sway(double delta);
     void update_bob(double delta);
     void store_position();
+    void cleanup_ray(int index);
 };
 
 }

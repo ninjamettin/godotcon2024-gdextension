@@ -14,3 +14,7 @@ config/name="THREVIVOR"
 run/main_scene="uid://c1c2cvpwks0d6"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
+
+[rendering]
+
+lights_and_shadows/use_physical_light_units=true

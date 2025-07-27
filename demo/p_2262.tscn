@@ -1,6 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bkv38s116gxib"]
+[gd_scene load_steps=6 format=3 uid="uid://bkv38s116gxib"]
 
 [ext_resource type="PackedScene" uid="uid://b8m41xi6031nb" path="res://P226.glb" id="1_11nwa"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_11nwa"]
 
 [sub_resource type="Animation" id="Animation_dcmmf"]
 length = 0.001
@@ -134,6 +136,10 @@ transform = Transform3D(1, 0, 0, 0, 1, -1.42109e-14, 0, 1.42109e-14, 1, 0, 0, 0)
 
 [node name="Trigger" parent="P226" index="7"]
 transform = Transform3D(1, 0, 0, 0, 1, -1.42109e-14, 0, 1.42109e-14, 1, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="P226" index="8"]
+transform = Transform3D(0.41, 0, 0, 0, 0.41, 1.77636e-15, 0, -1.77636e-15, 0.41, 0.0263307, -9.12958, -4.14064)
+mesh = SubResource("BoxMesh_11nwa")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1"]
 libraries = {

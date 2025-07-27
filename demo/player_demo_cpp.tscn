@@ -23,6 +23,7 @@ height = 1.8
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment"]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 5, 0)
+visible = false
 shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
@@ -60,6 +61,7 @@ fov = 90.3
 bob_frequency = 1.8
 
 [node name="Pistol" type="Pistol" parent="Player/Camera3D/WeaponManager"]
+fire_rate = 8.0
 sway_intensity = 0.1
 
 [node name="P2262" parent="Player/Camera3D/WeaponManager/Pistol" instance=ExtResource("1_yhhcc")]
