@@ -36,6 +36,8 @@ void Weapon::_process(double delta) {
 }
 
 void Weapon::setup_pistol_parts() {
+    UtilityFunctions::print("Weapon: Starting setup_pistol_parts for node: ", get_name());
+    
     // Find pistol parts in the scene
     pistol_root = this;
     pistol_slide   = Object::cast_to<MeshInstance3D>(get_node_or_null("Slide"));
@@ -48,12 +50,30 @@ void Weapon::setup_pistol_parts() {
         // Try to find in child nodes (P2262/AnimationPlayer path)
         Node* pistol_model = get_node_or_null("P2262");
         if (pistol_model) {
+            UtilityFunctions::print("Weapon: Found P2262 node, looking for AnimationPlayer");
             animation_player = Object::cast_to<AnimationPlayer>(pistol_model->get_node_or_null("AnimationPlayer"));
+        } else {
+            UtilityFunctions::print("Weapon: No P2262 node found");
+        }
+    }
+    
+    // Print all children to help debug
+    UtilityFunctions::print("Weapon: Node children count: ", get_child_count());
+    for (int i = 0; i < get_child_count(); i++) {
+        Node* child = get_child(i);
+        UtilityFunctions::print("Weapon: Child ", i, ": ", child->get_name(), " (", child->get_class(), ")");
+        
+        // Check if any child has AnimationPlayer
+        for (int j = 0; j < child->get_child_count(); j++) {
+            Node* grandchild = child->get_child(j);
+            UtilityFunctions::print("Weapon:   Grandchild ", j, ": ", grandchild->get_name(), " (", grandchild->get_class(), ")");
         }
     }
     
     if (animation_player) {
         UtilityFunctions::print("Weapon: Found AnimationPlayer");
+        PackedStringArray animations = animation_player->get_animation_list();
+        UtilityFunctions::print("Weapon: Available animations: ", animations);
     } else {
         UtilityFunctions::print("Weapon: AnimationPlayer not found");
     }
@@ -155,9 +175,9 @@ void Weapon::reset_parts() {
 void Weapon::play_fire_animation() {
     if (animation_player) {
         // Try common animation names - replace "fire" with your animation name
-        if (animation_player->has_animation("fire")) {
-            animation_player->play("fire");
-            UtilityFunctions::print("Weapon: Playing 'fire' animation");
+        if (animation_player->has_animation("pistol_shoot")) {
+            animation_player->play("pistol_shoot");
+            UtilityFunctions::print("Weapon: Playing 'pistol_shoot' animation");
         } else if (animation_player->has_animation("shoot")) {
             animation_player->play("shoot");
             UtilityFunctions::print("Weapon: Playing 'shoot' animation");
@@ -234,6 +254,7 @@ void WeaponManager::_process(double delta) {
 void WeaponManager::_input(const Ref<InputEvent>& event) {
     Ref<InputEventMouseButton> mouse_button = event;
     if (mouse_button.is_valid() && mouse_button->get_button_index() == MOUSE_BUTTON_LEFT) {
+        UtilityFunctions::print("WeaponManager: Left mouse button detected, pressed = ", mouse_button->is_pressed());
         handle_shoot_input(mouse_button->is_pressed());
     }
 }
@@ -242,11 +263,27 @@ void WeaponManager::store_positions() {
     weapon_children.clear();
     original_positions.clear();
     
+    UtilityFunctions::print("WeaponManager: Starting to store positions...");
+    
     for (int i = 0; i < get_child_count(); i++) {
-        Node3D* child = Object::cast_to<Node3D>(get_child(i));
-        if (child) {
-            weapon_children.append(child);
-            original_positions.append(child->get_position());
+        Node* child = get_child(i);
+        UtilityFunctions::print("WeaponManager: Found child ", i, " with name: ", child->get_name(), " type: ", child->get_class());
+        
+        Node3D* child_3d = Object::cast_to<Node3D>(child);
+        if (child_3d) {
+            weapon_children.append(child_3d);
+            original_positions.append(child_3d->get_position());
+            UtilityFunctions::print("WeaponManager: Added Node3D child: ", child->get_name());
+            
+            // Check if it's a Weapon
+            Weapon* weapon = Object::cast_to<Weapon>(child);
+            if (weapon) {
+                UtilityFunctions::print("WeaponManager: Child is a Weapon class: ", child->get_name());
+            } else {
+                UtilityFunctions::print("WeaponManager: Child is NOT a Weapon class: ", child->get_name());
+            }
+        } else {
+            UtilityFunctions::print("WeaponManager: Child is not Node3D: ", child->get_name());
         }
     }
     
@@ -305,13 +342,23 @@ void WeaponManager::update_bob(double delta) {
 }
 
 void WeaponManager::handle_shoot_input(bool pressed) {
+    UtilityFunctions::print("WeaponManager: handle_shoot_input called with pressed = ", pressed);
+    
     if (!pressed) return;
+    
+    UtilityFunctions::print("WeaponManager: Processing shoot input for ", weapon_children.size(), " children");
     
     for (int i = 0; i < weapon_children.size(); i++) {
         Variant weapon_variant = weapon_children[i];
+        Node* node = Object::cast_to<Node>(weapon_variant);
+        UtilityFunctions::print("WeaponManager: Checking child ", i, " name: ", node ? node->get_name() : "null");
+        
         Weapon* weapon = Object::cast_to<Weapon>(weapon_variant);
         if (weapon) {
+            UtilityFunctions::print("WeaponManager: Found Weapon, calling fire()");
             weapon->fire();
+        } else {
+            UtilityFunctions::print("WeaponManager: Child is not a Weapon class");
         }
     }
 }
