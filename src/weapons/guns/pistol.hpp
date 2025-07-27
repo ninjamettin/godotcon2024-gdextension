@@ -9,7 +9,7 @@ class Pistol : public WeaponManager {
     GDCLASS(Pistol, WeaponManager)
 
 private:
-    double fire_rate = 1.0;
+    double fire_rate = 5.0; // Default fire rate
 public:
     Pistol();
     ~Pistol();
@@ -19,6 +19,10 @@ public:
     
     // Pistol-specific methods
     void setup_first_person_position();
+    
+    // Fire rate property
+    double get_fire_rate() const { return fire_rate; }
+    void set_fire_rate(double rate) { fire_rate = rate; }
 
 
 };

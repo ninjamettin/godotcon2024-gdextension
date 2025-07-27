@@ -16,16 +16,14 @@ private:
     // Animation system
     AnimationPlayer* animation_player = nullptr;
     double animation_speed = 1.0;
-    double fire_rate = 5.0; // Shots per second
     
     // Sway settings
     double sway_intensity = 2.0;
     double sway_smoothness = 5.0;
     bool enable_sway = true;
-    
     // Bob settings
-    double bob_intensity = 0.005;
-    double bob_frequency = 0.8;
+    double bob_intensity = 0.01;
+    double bob_frequency = 1.8;
     bool enable_bob = true;
     
     // Current state
@@ -73,8 +71,6 @@ public:
     void set_enable_bob(bool enable) { enable_bob = enable; }
     double get_animation_speed() const { return animation_speed; }
     void set_animation_speed(double speed) { animation_speed = speed; }
-    double get_fire_rate() const { return fire_rate; }
-    void set_fire_rate(double rate) { fire_rate = rate; }
 
 private:
     void update_sway(double delta);

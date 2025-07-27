@@ -57,13 +57,15 @@ transform = Transform3D(0.991897, -0.0477096, 0.11775, 0.0220855, 0.977452, 0.20
 fov = 90.3
 
 [node name="WeaponManager" type="WeaponManager" parent="Player/Camera3D"]
-animation_speed = 2.0
-sway_intensity = 15.0
+bob_frequency = 1.8
 
-[node name="P2262" parent="Player/Camera3D/WeaponManager" instance=ExtResource("1_yhhcc")]
-transform = Transform3D(1.56499, 0, 0, 0, 1.56501, 0, 0, 0, 1.565, 0.296869, -0.13509, -0.303368)
+[node name="Pistol" type="Pistol" parent="Player/Camera3D/WeaponManager"]
+sway_intensity = 0.1
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Player/Camera3D/WeaponManager/P2262"]
+[node name="P2262" parent="Player/Camera3D/WeaponManager/Pistol" instance=ExtResource("1_yhhcc")]
+transform = Transform3D(1.56499, 3.72529e-09, -1.49012e-08, 3.72529e-09, 1.56501, 2.98023e-08, 1.49012e-08, 2.98023e-08, 1.565, 0.296869, -0.13509, -0.303368)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player/Camera3D/WeaponManager/Pistol/P2262"]
 libraries = {
 &"import": ExtResource("2_bujyn")
 }

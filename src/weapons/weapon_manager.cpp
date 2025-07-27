@@ -9,13 +9,12 @@ using namespace godot;
 
 WeaponManager::WeaponManager() {
     // Initialize all properties with default values
-    animation_speed = 1.0;
-    fire_rate = 5.0;
+    animation_speed = 3.0;
     
     sway_intensity = 1.0;
     sway_smoothness = 5.0;
     enable_sway = true;
-    bob_intensity = 0.005;
+    bob_intensity = 0.01;
     bob_frequency = 0.8;
     enable_bob = true;
     player_speed = 0.0;
@@ -47,14 +46,8 @@ void WeaponManager::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_enable_sway", "enable"), &WeaponManager::set_enable_sway);
     ClassDB::bind_method(D_METHOD("get_enable_bob"), &WeaponManager::get_enable_bob);
     ClassDB::bind_method(D_METHOD("set_enable_bob", "enable"), &WeaponManager::set_enable_bob);
-    ClassDB::bind_method(D_METHOD("get_animation_speed"), &WeaponManager::get_animation_speed);
-    ClassDB::bind_method(D_METHOD("set_animation_speed", "speed"), &WeaponManager::set_animation_speed);
-    ClassDB::bind_method(D_METHOD("get_fire_rate"), &WeaponManager::get_fire_rate);
-    ClassDB::bind_method(D_METHOD("set_fire_rate", "rate"), &WeaponManager::set_fire_rate);
     
-    // Expose properties to the editor
-    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "fire_rate", PROPERTY_HINT_RANGE, "1.0,20.0,0.1"), "set_fire_rate", "get_fire_rate");
-    ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "animation_speed", PROPERTY_HINT_RANGE, "0.1,5.0,0.1"), "set_animation_speed", "get_animation_speed");
+    // Expose properties to the editor (removed animation_speed slider)
     ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "sway_intensity", PROPERTY_HINT_RANGE, "0.0,15.0,0.1"), "set_sway_intensity", "get_sway_intensity");
     ClassDB::add_property("WeaponManager", PropertyInfo(Variant::FLOAT, "sway_smoothness", PROPERTY_HINT_RANGE, "0.1,20.0,0.1"), "set_sway_smoothness", "get_sway_smoothness");
     ClassDB::add_property("WeaponManager", PropertyInfo(Variant::BOOL, "enable_sway"), "set_enable_sway", "get_enable_sway");
@@ -89,15 +82,51 @@ void WeaponManager::_input(const Ref<InputEvent>& event) {
 void WeaponManager::setup_weapon_parts() {
     UtilityFunctions::print("WeaponManager: Starting setup for node: ", get_name());
     
+    // Debug: List all child nodes
+    UtilityFunctions::print("WeaponManager: Child count: ", get_child_count());
+    for (int i = 0; i < get_child_count(); i++) {
+        Node* child = get_child(i);
+        UtilityFunctions::print("WeaponManager: Child ", i, ": ", child->get_name(), " (", child->get_class(), ")");
+    }
 
-
-    // Find AnimationPlayer in P2262 child node
-    Node* pistol_model = get_node_or_null("P2262");
-    if (pistol_model) {
-        UtilityFunctions::print("WeaponManager: Found P2262 node");
-        animation_player = Object::cast_to<AnimationPlayer>(pistol_model->get_node_or_null("AnimationPlayer"));
+    // Find AnimationPlayer in Pistol -> P2262 -> AnimationPlayer hierarchy
+    Node* pistol_script = get_node_or_null("Pistol");
+    if (pistol_script) {
+        UtilityFunctions::print("WeaponManager: Found Pistol script node");
+        
+        // Debug: List Pistol's children
+        UtilityFunctions::print("WeaponManager: Pistol child count: ", pistol_script->get_child_count());
+        for (int i = 0; i < pistol_script->get_child_count(); i++) {
+            Node* child = pistol_script->get_child(i);
+            UtilityFunctions::print("WeaponManager: Pistol child ", i, ": ", child->get_name(), " (", child->get_class(), ")");
+        }
+        
+        Node* pistol_model = pistol_script->get_node_or_null("P2262");
+        if (pistol_model) {
+            UtilityFunctions::print("WeaponManager: Found P2262 node under Pistol");
+            
+            // Debug: List P2262's children
+            UtilityFunctions::print("WeaponManager: P2262 child count: ", pistol_model->get_child_count());
+            for (int i = 0; i < pistol_model->get_child_count(); i++) {
+                Node* child = pistol_model->get_child(i);
+                UtilityFunctions::print("WeaponManager: P2262 child ", i, ": ", child->get_name(), " (", child->get_class(), ")");
+            }
+            
+            animation_player = Object::cast_to<AnimationPlayer>(pistol_model->get_node_or_null("AnimationPlayer"));
+        } else {
+            UtilityFunctions::print("WeaponManager: No P2262 node found under Pistol");
+        }
     } else {
-        UtilityFunctions::print("WeaponManager: No P2262 node found");
+        UtilityFunctions::print("WeaponManager: No Pistol script node found - trying fallback hierarchy");
+        
+        // Fallback: Try the old hierarchy WeaponManager -> P2262 -> AnimationPlayer
+        Node* pistol_model = get_node_or_null("P2262");
+        if (pistol_model) {
+            UtilityFunctions::print("WeaponManager: Found P2262 node directly under WeaponManager (fallback)");
+            animation_player = Object::cast_to<AnimationPlayer>(pistol_model->get_node_or_null("AnimationPlayer"));
+        } else {
+            UtilityFunctions::print("WeaponManager: No P2262 node found in fallback either");
+        }
     }
     
     if (animation_player) {
@@ -118,9 +147,21 @@ void WeaponManager::fire() {
 
 void WeaponManager::play_fire_animation() {
     if (animation_player) {
-        // Calculate animation speed based on fire rate
-        // Higher fire rate = faster animation
-        double calculated_speed = animation_speed * (fire_rate / 5.0); // 5.0 is base fire rate
+        // Get fire_rate from Pistol script to calculate animation speed
+        double calculated_speed = animation_speed;
+        Node* pistol_script = get_node_or_null("Pistol");
+        if (pistol_script) {
+            // Try to get fire_rate from Pistol
+            Variant fire_rate_var = pistol_script->call("get_fire_rate");
+            if (fire_rate_var.get_type() == Variant::FLOAT) {
+                double fire_rate = fire_rate_var;
+                calculated_speed = animation_speed * (fire_rate / 5.0); // 5.0 is base fire rate
+                UtilityFunctions::print("WeaponManager: Using fire rate ", fire_rate, " for animation speed ", calculated_speed);
+            } else {
+                UtilityFunctions::print("WeaponManager: Could not get fire_rate from Pistol");
+            }
+        }
+        
         animation_player->set_speed_scale(calculated_speed);
         
         // Try common animation names
@@ -163,18 +204,28 @@ void WeaponManager::store_position() {
 void WeaponManager::apply_mouse_input(Vector2 mouse_delta) {
     if (!enable_sway) return;
     
+    // Debug mouse input
+    UtilityFunctions::print("WeaponManager: Mouse delta: ", mouse_delta);
+    
     // Horizontal sway should move opposite to mouse movement (realistic lag effect)
     // Vertical sway should also move opposite to mouse movement (look up = gun down)
-    Vector2 sway_delta = Vector2(-mouse_delta.x, -mouse_delta.y) * sway_intensity * 0.01;
+    Vector2 sway_delta = Vector2(-mouse_delta.x, mouse_delta.y) * sway_intensity * 0.01;
     target_sway = sway_delta;
+    
+    UtilityFunctions::print("WeaponManager: Sway delta: ", sway_delta, ", Target sway: ", target_sway);
 }
 
 void WeaponManager::update_sway(double delta) {
     current_sway = current_sway.lerp(target_sway, sway_smoothness * delta);
     
-    // Apply both horizontal and vertical sway
+    // Apply both horizontal and vertical sway, plus bob
     Vector3 sway_offset = Vector3(current_sway.x, current_sway.y, 0);
-    set_position(original_position + sway_offset);
+    Vector3 bob_position_offset = Vector3(0, bob_offset, 0);
+    Vector3 new_position = original_position + sway_offset + bob_position_offset;
+    set_position(new_position);
+    
+    // Debug sway application
+ 
     
     // Slower decay so sway is more noticeable
     target_sway = target_sway.lerp(Vector2(0, 0), delta * 0.5);
@@ -197,7 +248,6 @@ void WeaponManager::update_bob(double delta) {
         bob_offset = Math::lerp(bob_offset, 0.0, delta * 5.0);
     }
     
-    Vector3 current_pos = get_position();
-    current_pos.y = original_position.y + bob_offset;
-    set_position(current_pos);
+    // Don't set position here - let update_sway handle the final position
+    // Bob offset will be applied in update_sway
 }

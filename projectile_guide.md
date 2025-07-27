@@ -148,9 +148,9 @@ Player (CharacterBody3D)
 ### WeaponManager Configuration:
 ```cpp
 // In the editor or via code, configure global weapon behavior:
-weapon_manager->set_sway_intensity(1.5);        // Global sway amount
-weapon_manager->set_bob_intensity(0.005);       // Global bob amount
-weapon_manager->set_bob_frequency(0.8);         // Global bob speed
+weapon_manager->set_sway_intensity(1);        // Global sway amount
+weapon_manager->set_bob_intensity(0.03);       // Global bob amount
+weapon_manager->set_bob_frequency(1.8);         // Global bob speed
 ```
 
 ## 4. Base Weapon Class Features
