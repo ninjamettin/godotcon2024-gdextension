@@ -149,7 +149,7 @@ Player (CharacterBody3D)
 ```cpp
 // In the editor or via code, configure global weapon behavior:
 weapon_manager->set_sway_intensity(1);        // Global sway amount
-weapon_manager->set_bob_intensity(0.03);       // Global bob amount
+weapon_manager->set_bob_intensity(0.01);       // Global bob amount
 weapon_manager->set_bob_frequency(1.8);         // Global bob speed
 ```
 

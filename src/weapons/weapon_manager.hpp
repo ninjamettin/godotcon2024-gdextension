@@ -11,7 +11,6 @@
 
 namespace godot {
 
-// Unified WeaponManager class that handles both weapon behavior and global effects
 class WeaponManager : public Node3D {
     GDCLASS(WeaponManager, Node3D)
 
@@ -21,12 +20,13 @@ private:
     double animation_speed = 1.0;
     
     // Sway settings
-    double sway_intensity = 2.0;
+    double sway_intensity = 0.2;
     double sway_smoothness = 5.0;
     bool enable_sway = true;
+    
     // Bob settings
     double bob_intensity = 0.01;
-    double bob_frequency = 1.8;
+    double bob_frequency = 5;
     bool enable_bob = true;
     
     // Current state
@@ -35,28 +35,16 @@ private:
     double bob_time = 0.0;
     double bob_offset = 0.0;
     bool is_moving = false;
-    double player_speed = 0.0; // Current player movement speed
+    double player_speed = 0.0;
     
-    // Original position tracking
+    // Position tracking
     Vector3 original_position;
     
-    // Muzzle flash and projectile system
-    Vector3 muzzle_offset = Vector3(0.026, -9.13, -4.14); // Relative to gun model
+    // Muzzle flash system
+    Vector3 muzzle_offset = Vector3(0.026, -9.13, -4.14);
     MeshInstance3D* muzzle_flash = nullptr;
     double muzzle_flash_timer = 0.0;
-    double muzzle_flash_duration = 0.05; // 50ms flash
-    
-    // Flying ray/projectile system
-    struct FlyingRay {
-        MeshInstance3D* visual = nullptr;
-        Vector3 position;
-        Vector3 direction;
-        double speed = 1000.0; // Units per second
-        double lifetime = 3.0; // Max 3 seconds in air
-        double current_time = 0.0;
-    };
-    // We'll use a simple array of rays for now
-    // TypedArray<Ref<RefCounted>> flying_rays; // Store flying rays
+    double muzzle_flash_duration = 0.05;
 
 public:
     WeaponManager();
@@ -81,12 +69,13 @@ public:
     void create_muzzle_flash();
     void update_muzzle_flash(double delta);
     void fire_projectile();
-    void update_flying_rays(double delta);
     Vector3 get_muzzle_world_position();
     
     // Property getters/setters
     double get_sway_intensity() const { return sway_intensity; }
-    void set_sway_intensity(double intensity) { sway_intensity = intensity; }
+    void set_sway_intensity(double intensity) { 
+        sway_intensity = intensity;
+    }
     double get_sway_smoothness() const { return sway_smoothness; }
     void set_sway_smoothness(double smoothness) { sway_smoothness = smoothness; }
     double get_bob_intensity() const { return bob_intensity; }
@@ -104,7 +93,6 @@ private:
     void update_sway(double delta);
     void update_bob(double delta);
     void store_position();
-    void cleanup_ray(int index);
 };
 
 }

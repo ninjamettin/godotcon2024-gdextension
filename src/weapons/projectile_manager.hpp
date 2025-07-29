@@ -20,9 +20,7 @@ struct ProjectileData {
     double traveled_distance;
     Node* shooter;
     bool active;
-    
-    // Visual representation
-    RID visual_instance;  // For rendering the projectile trail
+    RID visual_instance;
 };
 
 class ProjectileManager : public Node {
@@ -31,16 +29,14 @@ class ProjectileManager : public Node {
 private:
     static ProjectileManager* singleton;
     
-    Array active_projectiles;  // Pool of ProjectileData
-    int max_projectiles = 1000; // Performance limit
+    Array active_projectiles;
+    int max_projectiles = 1000;
     int next_projectile_index = 0;
     
-    // Visual settings
     Ref<Material> projectile_material;
     Ref<Mesh> projectile_mesh;
-    double projectile_visual_length = 0.5; // Length of visible trail
+    double projectile_visual_length = 0.5;
     
-    // Physics world for raycasting
     PhysicsDirectSpaceState3D* physics_space = nullptr;
 
 public:
@@ -53,12 +49,10 @@ public:
     void _ready() override;
     void _process(double delta) override;
     
-    // Projectile management
     void create_projectile(Vector3 start_pos, Vector3 direction, double speed, double damage, Node* shooter, double max_range = 100.0);
     void update_projectiles(double delta);
     void cleanup_projectile(int index);
     
-    // Visual management
     void setup_projectile_visuals();
     void update_projectile_visual(int index);
     void hide_projectile_visual(int index);
